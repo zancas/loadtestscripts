@@ -27,7 +27,14 @@ def main():
 
     #Setup the command that will invoke tahoe via subprocess
     #Note: The script assumes it is being invoked by a tahoe-aware shell.
-    putstring = 'tahoe put -u http://127.0.0.1:3456 %s' % testfilepath.path
+    if len(sys.argv) == 4 and sys.argv[2] == '--mutable':
+        putstring = '/home/arc/tahoe-lafs/bin/tahoe put -u http://127.0.0.1:3456 %(localfile)s URI:SSK:%(capability)s' % \
+        {'localfile': testfilepath.path,
+         'capability':'%s' % sys.argv[3]
+         }
+
+    else:
+        putstring = 'tahoe put -u http://127.0.0.1:3456 %s' % testfilepath.path
     putcommandlist = putstring.split()
 
     HTTPNot200Count = 0
