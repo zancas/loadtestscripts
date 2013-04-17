@@ -17,7 +17,8 @@ def main():
     fh.close()
     errorout = open('%s/errors.txt'%trialtime,'a')
     trialtimes = open('%s/trialtimes.txt'%trialtime,'a')
-    putstring = '/home/arc/tahoe-lafs/bin/tahoe put %(localfile)s' % \
+    # The script assumes it is being invoked by a tahoe-aware shell.
+    putstring = 'tahoe put %(localfile)s' % \
         {'localfile':datafilename}
     putcommandlist = putstring.split()
     while counter < numrequests:
@@ -38,7 +39,8 @@ def main():
         if HTTPCODE != '200':
             HTTPNot200Count = HTTPNot200Count + 1
             thetime = time.time()
-            errorstring = "At %s, on the %sth 'put' HTTPCODE is:  %s .\nComm Tuple is %s.\n" % (thetime, counter, HTTPCODE, SubProcComm)
+            errorstring = "At %s, on the %sth 'put' HTTPCODE is:  %s .\nComm Tuple is %s.\n" % 
+            (thetime, counter, HTTPCODE, SubProcComm)
             errorout.write(errorstring)
     
     trialstop = time.time()
