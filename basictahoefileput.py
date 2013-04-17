@@ -1,28 +1,37 @@
 #! /usr/bin/env python
 
-import subprocess, time
+import subprocess, time, sys
 from twisted.python.filepath import FilePath
 
 def append_to_filepath(filepath, data, delimiter='\n'):
-    prefixdata = filepath.getContent()
-    if prefixdata != '':
+    if filepath.exists():
+        prefixdata = filepath.getContent()
         data = delimiter.join( (prefixdata, data) )
     filepath.setContent(data)
-    
+
 
 def main():
-    numrequests = 10000
+    #Nicely format the output of the timing data.
+    numrequests = int(sys.argv[1])
     width = str(len(str(numrequests)))
     prestring = "%."+width+"d start: %s\tstop: %s\tdelta: %.4s \n"
-    counter = 0
-    HTTPNot200Count = 0
+
+    #Start the timer at the last possible moment.
     trialtime = str(time.time())
+
+    #Setup the directory/files where output will be stored.
+    FilePath(trialtime).makedirs()
     testfilepath   = FilePath(trialtime).child('testfile')
     errorfilepath  = FilePath(trialtime).child('errors.txt')
     trialtimespath = FilePath(trialtime).child('trialtimes.txt')
-    # The script assumes it is being invoked by a tahoe-aware shell.
-    putstring = 'tahoe put %s' % testfilepath.path
+
+    #Setup the command that will invoke tahoe via subprocess
+    #Note: The script assumes it is being invoked by a tahoe-aware shell.
+    putstring = 'tahoe put -u http://127.0.0.1:3456 %s' % testfilepath.path
     putcommandlist = putstring.split()
+
+    HTTPNot200Count = 0
+    counter = 0
     while counter < numrequests:
         counter = counter + 1
         data_to_write = 'a'*55 + str(counter%10)
@@ -42,11 +51,10 @@ def main():
             errorstring = "At %s, on the %sth 'put' HTTPCODE is:  %s .\nComm Tuple is %s.\n" % \
                           (thetime, counter, HTTPCODE, SubProcComm)
             append_to_filepath(errorfilepath, errorstring)
-    
+
     trialstop = time.time()
-    totaltime = (trialstop - trialtime)/3600.
-    errorfrequencystr = str((HTTPNot200Count*1.0) / (counter*1.0))
-    errorcountstring = "The number of responses to the put request, not headed by HTTP 200 Codes in %s attempts is: %s\n" % (counter, HTTPNot200Count) 
+    totaltime = (trialstop - float(trialtime))/3600.
+    errorcountstring = "The number of responses to the put request, not headed by HTTP 200 Codes in %s attempts is: %s\n" % (counter, HTTPNot200Count)
     append_to_filepath(errorfilepath, errorcountstring)
     print "The %s request trial took a total of %.5s hours." % (numrequests, totaltime)
 
