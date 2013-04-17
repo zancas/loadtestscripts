@@ -1,0 +1,32 @@
+Prerequisites:
+
+* a tahoe executable on the invoking shell's PATH
+* a running tahoe node that has been introduced to a storage server using the backend you want to test
+* a webserver running on that node connected to 127.0.0.1:3456
+* the "matplotlib" graphing library
+
+Given the above:
+
+  To test the effect of putting "N" larger than 56 bytes immutables to the grid run:
+
+   ./fileputter.py N  <---  We've been running N = 10000
+
+  To produce a png showing the results of your test:
+
+  (0) Wait 'til the test finishes.
+  (1) See that there's a new new subdirectory of PWD named "Seconds_Since_the_Epoch"
+  (2) run:
+
+   ./simplerttgrapher.py "Seconds_Since_the_Epoch"
+
+  (3) Find a file named: "Round_Trip_Times.png" in the "Seconds_Since_the_Epoch" directory.
+
+  To test the effect of putting "N" strings to a single mutable file on the grid:
+
+  (0) Extract a write cap for a mutable file from the tahoe WUI by selecting "SDMF" radio button, and "Upload", and then copying the long suffix string from the end of "URI:SSK:" to the end.  We'll call this MUTCAP.
+
+  (1) run:
+
+     "./fileputter.py N --mutable 'MUTCAP'"
+
+  (2) visualize in in the same way as for the immutable tests.

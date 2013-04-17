@@ -28,11 +28,11 @@ def main():
     #Setup the command that will invoke tahoe via subprocess
     #Note: The script assumes it is being invoked by a tahoe-aware shell.
     if len(sys.argv) == 4 and sys.argv[2] == '--mutable':
-        putstring = '/home/arc/tahoe-lafs/bin/tahoe put -u http://127.0.0.1:3456 %(localfile)s URI:SSK:%(capability)s' % \
+        putstring = 'tahoe put -u http://127.0.0.1:3456 %(localfile)s URI:SSK:%(capability)s' % \
         {'localfile': testfilepath.path,
          'capability':'%s' % sys.argv[3]
          }
-
+        FilePath(trialtime).child('mutable').setContent('mutable')
     else:
         putstring = 'tahoe put -u http://127.0.0.1:3456 %s' % testfilepath.path
     putcommandlist = putstring.split()
@@ -44,6 +44,7 @@ def main():
         data_to_write = 'a'*55 + str(counter%10)
         append_to_filepath(testfilepath, data_to_write)
         startt = time.time()
+        print putcommandlist
         SubProcObj = subprocess.Popen(putcommandlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         SubProcObj.wait()
         stopt = time.time()
