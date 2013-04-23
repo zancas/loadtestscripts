@@ -14,7 +14,7 @@ def main():
     #Nicely format the output of the timing data.
     numrequests = int(sys.argv[1])
     width = str(len(str(numrequests)))
-    prestring = "%."+width+"d start: %s\tstop: %s\tdelta: %.4s \n"
+    prestring = "%."+width+"d start: %s\tstop: %s\tdelta: %.4s"
 
     #Start the timer at the last possible moment.
     trialtime = str(time.time())
