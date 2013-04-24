@@ -13,16 +13,26 @@ zeroshifted_trial_starttimes = [ x - trial_starttimes[0] for x in trial_starttim
 trial_stoptimes = [float(tt[4]) for tt in trialtime_lists]
 zeroshifted_trial_stoptimes = [ x - trial_starttimes[0] for x in trial_stoptimes]
 
+trial_length = max(zeroshifted_trial_stoptimes)
+x_margin = (trial_length/20)
 alldelta_times = [float(tt[-1]) for tt in trialtime_lists]
-longest_rtt = max(alldelta_times)
-print "longest_rtt is %s" % longest_rtt
-longest_rtt_afterstart = float(trialtime_lists[alldelta_times.index(longest_rtt)][2])-trial_starttimes[0]
-plt.plot(longest_rtt_afterstart, longest_rtt, 'gv', markersize=10) 
+longest_rtt_y = max(alldelta_times)
+yaxis_height = longest_rtt_y+longest_rtt_y/3
+print "The longest round trip took %s seconds." % longest_rtt_y
+longest_trial_index = alldelta_times.index(longest_rtt_y)
+longest_rtt_x = float(trialtime_lists[longest_trial_index][2])-trial_starttimes[0]
+longest_point = (longest_rtt_x, longest_rtt_y)
+annotation_offset = (0, longest_rtt_y/6)
+longest_annotation_point = tuple( [sum(x) for x in zip(longest_point, annotation_offset)] )
+longest_annotation = '(%.2f, %.2f)' % longest_point
+plt.annotate(longest_annotation, longest_point, longest_annotation_point, 
+             arrowprops={'linewidth':1, 'linestyle':'dashed'})
+#plt.plot(longest_rtt_x, longest_rtt_y, 'gv', markersize=10) 
 plt.plot(zeroshifted_trial_starttimes, alldelta_times, 'b.', markersize=2)
 plt.plot(zeroshifted_trial_stoptimes, alldelta_times, 'b.', markersize=2)
-plt.ylabel("Round Trip Times (s)")
-plt.xlabel("Time From Beginning of the First Trial (s)")
-plt.axis([-150, max(zeroshifted_trial_stoptimes)+150, 0, 7.25])
+plt.ylabel("Round Trip Times (seconds)")
+plt.xlabel("Time From Beginning of the First Trial (seconds)")
+plt.axis([-x_margin, trial_length+x_margin, 0, yaxis_height])
 plt.title("Round Trip Times")
 pngfilename = os.path.join(sys.argv[1], 'Round_Trip_Times.png')
 plt.savefig(pngfilename)
